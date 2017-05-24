@@ -1,14 +1,17 @@
 class VendingMachineRevised
-	puts "Enter an Item Number:"
+	puts "This Vending Machine contains 6 Items to dispense"
+	puts "Which Item number you want to dispense:"
+
 	item = gets.chomp.to_i
 
 	$prices = [10,75,40,75,90,40]
 
-	if(!(item < $prices.length))
+	if(!(item <= $prices.length))
 		puts "Sorry, Item number that you entered doesn't exist."
+		exit
 	end
 
-	puts "Enter Amount:"
+	puts "Enter INR #{$prices[item-1]} for this Item:"
 	paid = gets.chomp.to_i
 
 	def dispense_item(item,paid)

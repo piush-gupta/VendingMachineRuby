@@ -6,13 +6,17 @@ class VendingMachine
 	$item5 = 50
 	$item6 = 75
 
-	puts "Enter an item number:"
+	puts "This Vending Machine contains 6 Items to dispense"
+	puts "Which Item number you want to dispense:"
 	item = gets.chomp.to_i
 
-	puts "Enter amount:"
+	puts "Enter amount for this Item:"
 	paid = gets.chomp.to_i
 
 	def dispense_item(item,paid)
+			puts "item="+item.to_s
+			puts "paid="+paid.to_s
+
 		if (item == 2 || item == 4 || item == 6)
 			if (paid >= $item2)
 				output =  "Thank you for buying item #{item}, your change is INR #{paid-$item2}. Please come again!"
@@ -40,9 +44,9 @@ class VendingMachine
 		else
 			output = "Sorry, Item number that you entered doesn't exist."
 		end
-		puts output
+		output
 	end
 
 	obj = VendingMachine.new()
-	obj.dispense_item(item,paid)
+	puts obj.dispense_item(item,paid)
 end		
