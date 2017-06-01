@@ -6,6 +6,8 @@ class VendingMachineAdvanced
 	$quantity = []
 	$prices = [8,12,15,20]
 	$coins = {1 => 0, 2 => 0, 5 => 0,10 => 0}
+	$tmp_coins = {1 => 0, 2 => 0, 5 => 0,10 => 0}
+	$refund_coins = {1 => 0, 2 => 0, 5 => 0,10 => 0}
 
 	$items.each do |item|
 		puts "For #{item}:"
@@ -15,14 +17,16 @@ class VendingMachineAdvanced
 	puts "Load coins into machine, You can load coins of 1,2,5 and 10 only"
 	$coins.keys.each do |coin|
 		puts "Load coins of #{coin} Rupee:"
-		$coins[coin] = gets.chomp.to_i
+		val = gets.chomp.to_i
+		$coins[coin] = val
+		$tmp_coins[coin] = val
 	end
 
 	puts "Final status of Vending Machine is as following:"
 	puts "Items => #{$items}"
 	puts "Prices => #{$prices}"
 	puts "Quantity => #{$quantity}"
-	puts "Available Coins inventory is:#{$coins}"
+	puts "Available Coins inventory => #{$coins}"
 
 	puts "Enter item name to dispense:"
 	$item = gets.chomp.capitalize
@@ -44,9 +48,23 @@ class VendingMachineAdvanced
 				inserted_coin_value = gets.chomp.to_i
 				if($coins.keys).include?(inserted_coin_value)
 					#will initial invalid_coin_attempt here
-					received += inserted_coin_value
-					amount_to_grab -= inserted_coin_value
-					$coins[inserted_coin_value] += 1
+					if(amount_to_grab < inserted_coin_value)
+						amount = is_ready_to_refund(inserted_coin_value-amount_to_grab)
+						if(amount > 0)
+							puts "issuficient change, insert another coin"
+						else
+							$coins[inserted_coin_value] += 1
+							$tmp_coins[inserted_coin_value] += 1
+							calculate_refund(inserted_coin_value-amount_to_grab)
+							received += inserted_coin_value
+							amount_to_grab -= inserted_coin_value
+						end
+					else
+						$coins[inserted_coin_value] += 1
+						$tmp_coins[inserted_coin_value] += 1
+						received += inserted_coin_value
+						amount_to_grab -= inserted_coin_value
+					end
 				else
 					puts "Invalid Coin, Please enter valid coin"
 					invalid_coin_attempt += 1
@@ -61,8 +79,52 @@ class VendingMachineAdvanced
 		puts "Current status of Vending Machine is as following:"
 		puts "Items => #{$items}"
 		puts "Quantity => #{$quantity}"
-		puts "Available Coins inventory is:#{$coins}"
+		puts "Available Coins inventory => #{$coins}"
 	end
+
+	def is_ready_to_refund(amount)
+		9.times do
+			if(((amount / 10) >= 1) && $tmp_coins[10] > 0)
+				amount -= 10
+			 $tmp_coins[10] -= 1
+			elsif (((amount / 5) >= 1) && $tmp_coins[5] > 0)
+				amount -= 5
+			 $tmp_coins[5] -= 1
+			elsif (((amount / 2) >= 1) && $tmp_coins[2] > 0)
+				amount -= 2
+			 $tmp_coins[2] -= 1
+			elsif (((amount / 1) >= 1) && $tmp_coins[1] > 0)
+				amount -= 1
+			 $tmp_coins[1] -= 1
+			end
+		end
+		return amount
+	end
+
+	def calculate_refund(amount)
+		puts "Please collect your Rs #{amount} as refund"
+		while(amount > 0) do
+			if(((amount / 10) >= 1) && $coins[10] > 0)
+				amount -= 10
+				$coins[10] -= 1
+				$refund_coins[10] += 1
+			elsif (((amount / 5) >= 1) && $coins[5] > 0)
+				amount -= 5
+				$coins[5] -= 1
+				$refund_coins[5] += 1
+			elsif (((amount / 2) >= 1) && $coins[2] > 0)
+				amount -= 2
+				$coins[2] -= 1
+				$refund_coins[2] += 1
+			elsif (((amount / 1) >= 1) && $coins[1] > 0)
+				amount -= 1
+				$coins[1] -= 1
+				$refund_coins[1] += 1
+			end
+		end
+		puts "refund coins #{$refund_coins}"
+	end
+
 
 	if($quantity[$items.index($item)] >= quantity_to_dispense)
 		$amount_to_pay = $prices[$items.index($item)] * quantity_to_dispense
